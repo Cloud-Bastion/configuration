@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
     id("com.strumenta.antlr-kotlin") version "1.0.0"
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm") version "1.9.21"
 }
 
 repositories {
@@ -11,7 +11,10 @@ repositories {
 }
 
 dependencies {
+    implementation(kotlin("reflect"))
+    implementation("com.google.inject", "guice", "7.0.0")
     implementation("com.strumenta:antlr-kotlin-runtime:1.0.0")
+    implementation("com.google.code.gson:gson:2.11.0")
 }
 
 kotlin {

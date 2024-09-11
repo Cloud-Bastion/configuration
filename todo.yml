@@ -1,24 +1,22 @@
 #Commentary
 
 #String (key = value)
-  servername = "NexoizRP",
+servername = "NexoizRP",
   #Integer
-  maxPlayers = 5,
+maxPlayers = 5,
   #Double
-  playerRange = 5.0
+playerRange = 5.0
   #Long
-  accuracy = 0.00000233
+accuracy = 0.00000233
   #List
-  playerList = ["Aventix", "Raphael"]
+playerList = ["Aventix", "Raphael"]
   #Map
-  map = [
-  {} = {},
-  test = "teststring"
-]
-  #String Block
+map = [
+{} = {},
+test = "teststring", test2 = "teststring3"
+#String Block
 
-
-  #Object
+#Object
   playerObject = {
   name = "Aventix",
   age = 22,

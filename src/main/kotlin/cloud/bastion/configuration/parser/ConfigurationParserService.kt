@@ -12,7 +12,8 @@ fun main() {
 
 class ConfigurationParserService {
     fun parse() {
-        val testFile: File = File("C:/Development/CLOUD-BASTION/configuration/config/", "test.bastion")
+        // DO NOT COMMIT THIS LINE
+        val testFile: File = File("F:/CloudBastion/configuration/config/", "test.bastion")
 
         System.err.println(testFile.absolutePath)
         if (!testFile.exists()) {
@@ -23,10 +24,15 @@ class ConfigurationParserService {
 
         val inputStream = CharStreams.fromString(testFile.readText())
         val lexer = BastionYMLLexer(inputStream)
-        val toketStream = CommonTokenStream(lexer)
-        val parser = BastionYMLParser(toketStream)
-        val tree = parser.file()
+        val tokenStream = CommonTokenStream(lexer)
+        val parser = BastionYMLParser(tokenStream)
 
-        println(tree.toStringTree())
+        //val tree: BastionYMLParser.FileContext = parser.file()
+
+        var s = SimplePropertyVisitor().visit(parser.keyValuePair())
+        println(s)
+
+        // println(tree.line().toString()) // List of top level elements, in this case words ('lines' in the grammar)
+        //println(tree.toStringTree())
     }
 }

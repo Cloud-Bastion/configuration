@@ -1,3 +1,6 @@
+// ~ = not
+//      e. g. ~INT -> everything but an integer
+
 grammar BastionYML;
 
 // Entry point
@@ -12,6 +15,8 @@ line: COMMENT
     | stringblock
     ;
 
+//
+
 // Comments
 COMMENT: [#].* -> skip;
 
@@ -19,13 +24,13 @@ COMMENT: [#].* -> skip;
 property: ID '=' value (',' ID '=' value)* (',')?;
 
 // Different value types
-value: STRING
-     | INT
-     | FLOAT
-     | BOOLEAN
-     | list
-     | map
-     | object;
+value: STRING       # StringValue
+     | INT          # IntegerValue
+     | FLOAT        # FloatValue
+     | BOOLEAN      # BooleanValue
+     | list         # ListValue
+     | map          # MapValue
+     | object       # ObjectValue;
 
 // Multi-line strings block
 
@@ -36,7 +41,7 @@ list: ID '=' '[' (value (',' value)*)? (',')? ']';
 map: ID '=' '{' (keyValuePair (',' keyValuePair)*)? (',')? '}';
 
 // Multi-line string block
-stringblock: ID '=' ('["\r\n]')* '|' WS? '"' (~STRING'["\r\n]')* '"' (WS? '\n' WS? '|' WS? '"' (~STRING'["\r\n]')) ;
+stringblock: ID '=' ('["\r\n]')* '|' WS? '"' (STRING'["\r\n]')* '"' (WS? '\n' WS? '|' WS? '"' (STRING'["\r\n]')) ;
 //stringblock2: ID '=' (~'["\r\n]')* '|' WS? '"' (~'["\r\n]')* '"' (WS? '\n' WS? '|' WS? '"' (~'["\r\n]')) ;
 
 // Key-value pairs in maps

@@ -1,4 +1,5 @@
-test = "string"
+test = "string1"
+soos = "eins", second = "s"
 stringblock =
 | "Test"
 | "Test"
