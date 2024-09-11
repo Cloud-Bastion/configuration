@@ -1,0 +1,7 @@
+test = "string"
+stringblock =
+| "Test"
+| "Test"
+| "Test"
+
+string = "test"

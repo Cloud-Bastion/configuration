@@ -1,0 +1,33 @@
+#Commentary
+
+#String (key = value)
+  servername = "NexoizRP",
+  #Integer
+  maxPlayers = 5,
+  #Double
+  playerRange = 5.0
+  #Long
+  accuracy = 0.00000233
+  #List
+  playerList = ["Aventix", "Raphael"]
+  #Map
+  map = [
+  {} = {},
+  test = "teststring"
+]
+  #String Block
+
+
+  #Object
+  playerObject = {
+  name = "Aventix",
+  age = 22,
+  friends = [{
+  userId = 42224,
+  bestFriend = true
+  }, {
+  userId = 99999,
+  bestFriend = false
+  }
+  ]
+}
