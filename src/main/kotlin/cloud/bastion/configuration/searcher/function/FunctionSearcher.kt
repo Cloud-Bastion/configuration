@@ -29,7 +29,7 @@ class FunctionSearcher {
             else packageNames.asSequence().flatMap { name -> classPath.getTopLevelClassesRecursive(name).asSequence() }
                 .toList()).asSequence().mapNotNull { classInfo -> classInfo.load().kotlin }
                 .flatMap { clazz -> clazz.declaredFunctions.asSequence() }
-                .filter { function -> functionFilters.all { it.filter(function) } }
+                .filter { function -> functionFilters.all { it.test(function) } }
         } catch (e: Exception) {
             e.printStackTrace()
             emptySequence()
@@ -76,7 +76,7 @@ class FunctionSearcher {
                     clazz.declaredFunctions.asSequence()
                 }
                 .filter { function ->
-                    val matches = functionFilters.all { it.filter(function) }
+                    val matches = functionFilters.all { it.test(function) }
                     println("Function ${function.name} matches all filters: $matches")
                     matches
                 }
