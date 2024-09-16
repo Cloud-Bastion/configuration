@@ -4,7 +4,7 @@ import cloud.bastion.configuration.config.type.BastionConfigType
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class Configuration(
     val path: String = "",
     val filename: String,
