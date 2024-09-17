@@ -10,10 +10,6 @@ open class BastionConfigType : ConfigType {
     @Inject
     private lateinit var injector: Injector
 
-    override fun onLoad(clazz: KClass<out Config>) {
-        TODO("Not yet implemented")
-    }
-
     override fun onSave(clazz: KClass<out Config>) {
         TODO("Not yet implemented")
     }
