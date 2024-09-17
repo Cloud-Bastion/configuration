@@ -12,9 +12,12 @@ repositories {
 
 dependencies {
     implementation(kotlin("reflect"))
-    implementation("com.google.inject", "guice", "7.0.0")
+    implementation("com.google.inject:guice:7.0.0")
     implementation("com.strumenta:antlr-kotlin-runtime:1.0.0")
-    implementation("com.google.code.gson:gson:2.11.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.+")
+    testImplementation(kotlin("test"))
+    testImplementation("org.mockito:mockito-core:5.13.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 }
 
 kotlin {
@@ -48,6 +51,10 @@ val generateKotlinGrammarSource = tasks.register<AntlrKotlinTask>("generateKotli
 
 tasks.withType<KotlinCompile<*>> {
     dependsOn(generateKotlinGrammarSource)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 kotlin {
