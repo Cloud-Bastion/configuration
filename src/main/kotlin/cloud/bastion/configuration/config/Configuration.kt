@@ -3,7 +3,7 @@ package cloud.bastion.configuration.config
 import cloud.bastion.configuration.config.type.BastionConfigType
 import kotlin.reflect.KClass
 
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Configuration(
     val path: String = "",
