@@ -1,6 +1,22 @@
 // ~ = not
 //      e. g. ~INT -> everything but an integer
 
+/*
+Stringblocks:
+
+block1: |
+ Line breaks are significant
+ So a new line break will be exactly at the point
+ where you do a line break in your config file
+
+block2: >
+ Just a way of structuring your strings within the config file.
+ The parser will output a single coherent string without line breaks
+ so that you can fold it into space later in the application.
+
+
+*/
+
 grammar BastionYML;
 
 // Entry point
@@ -34,7 +50,7 @@ value: STRING       # StringValue
 
 // Multi-line strings block
 
-// Lists
+// Lists : supports multi line lists by default
 list: ID '=' '[' (value (',' value)*)? (',')? ']';
 
 // Maps
