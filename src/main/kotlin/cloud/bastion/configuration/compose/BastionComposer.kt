@@ -1,7 +1,11 @@
 package cloud.bastion.configuration.compose
 
 import cloud.bastion.configuration.parser.Comment
+import cloud.bastion.configuration.parser.Group
+import cloud.bastion.configuration.parser.Order
+import com.google.common.collect.ImmutableList
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 
@@ -9,6 +13,18 @@ class BastionComposer {
 
     private object BastionFileRules {
         const val SINGLE_INDENT: Int = 3
+    }
+
+    fun <T> MutableList<T?>.safeAdd(index: Int, element: T?) {
+        while (this.size <= index) {
+            this.add(null)
+        }
+        this[index] = element
+    }
+
+    class ConfigGroup(groupName: String, groupOrder: Int = -1) {
+        val properties: MutableList<KProperty1<*, *>?> = mutableListOf()
+        val addLast: MutableList<KProperty1<*, *>?> = mutableListOf()
     }
 
     fun generateConfig(config: Any, recursionDepth: Int = 0): String {
@@ -49,25 +65,66 @@ class BastionComposer {
             }
         }
 
-        /*
-
-            Todo for tomorrow:
-            - Implement Map composition with the following pattern:
-                map: (
-                    key = value,
-                    key2 = value2,
-                    key4 = [listE1, listE2, ....]
-                )
-            - the best approach would be to use the same structure as the top-level function
-            - however, the property iteration has to be replaced with a more universal operation
-              as we cannot simply iterate over class-level properties in a map here.
-            - So we have to iterate the properties separately in the top level function,
-              which we have to do anyway to implement @Order and @Group annotations for
-              property order
-
-         */
+        val finalOrder: MutableMap<Int, Any> = mutableMapOf()
+        val groups: MutableMap<String, ConfigGroup> = mutableMapOf()
+        val addLast: MutableList<KProperty1<*, *>> = mutableListOf()
 
         configClass.memberProperties.forEach { property ->
+            val group: Group? = property.findAnnotation<Group>()
+            val order: Order? = property.findAnnotation<Order>()
+
+            if (group == null && order != null) {
+                finalOrder[order.position] = property
+                return@forEach
+            }
+
+            if (group != null) {
+                if (!groups.containsKey(group.groupName)) {
+                    val configGroup: ConfigGroup = ConfigGroup(group.groupName, group.groupOrder)
+                    groups[group.groupName] = configGroup
+                    finalOrder[group.groupOrder] = configGroup
+                }
+                val currentGroup: ConfigGroup = groups[group.groupName]!!
+
+                if (order == null) {
+                    currentGroup.addLast.add(property)
+                } else {
+                    currentGroup.properties.safeAdd(order.position, property)
+                }
+
+                return@forEach
+            }
+
+            addLast.add(property)
+
+        }
+
+        val properties: MutableList<KProperty1<*, *>> = mutableListOf()
+        finalOrder.entries.sortedBy { it.key }.forEach {(position, entry) ->
+            run {
+                when (entry) {
+                    is ConfigGroup -> {
+                        entry.properties.forEach {
+                            if (it != null) {
+                                properties.add(it)
+                            }
+                        }
+                    }
+
+                    is KProperty1<*, *> -> {
+                        properties.add(entry)
+                    }
+
+                    else -> {
+                        TODO("Throw Exception, unknown property type")
+                    }
+                }
+            }
+        }
+
+        addLast.forEach { properties.add(it) }
+
+        properties.forEach { property ->
             val docs: Comment? = property.findAnnotation<Comment>()
 
             // if the current member is annotated with @Documentation
@@ -95,7 +152,8 @@ class BastionComposer {
                     output.append("]\n")
                 }
                 is Map<*,*> -> {
-
+                    val map: Map<String, Int> = mapOf()
+                    //map.entries.forEach()
                 }
 //                is Sequence<*> -> {
 //
