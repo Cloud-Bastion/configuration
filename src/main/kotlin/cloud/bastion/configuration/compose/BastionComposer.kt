@@ -3,7 +3,6 @@ package cloud.bastion.configuration.compose
 import cloud.bastion.configuration.parser.Comment
 import cloud.bastion.configuration.parser.Group
 import cloud.bastion.configuration.parser.Order
-import com.google.common.collect.ImmutableList
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
@@ -55,15 +54,41 @@ class BastionComposer {
                         generateIndent(additionalIndent = listRecursionDepth + 1)
                         output.append("],\n")
                     }
+
                     is Any -> {
                         output.append("{\n")
                         output.append(generateConfig(it, listRecursionDepth + 2))
                         generateIndent(additionalIndent = 1)
-                        output.append("{,\n")
+                        output.append("},\n")
                     }
                 }
             }
         }
+
+//        fun formatMap(map: Map<*, *>, mapRecursionDepth: Int = 0) {
+//            map.entries.forEach { (key, value) ->
+//                // We need an additional layer of indentation as
+//                // list elements shall be indented by one level to
+//                // separate them from other properties.
+//                generateIndent(additionalIndent = 1 + mapRecursionDepth)
+//                when (value) {
+//                    is String -> output.append("\"$it\",\n")
+//                    is Int -> output.append("$it,\n")
+//                    is List<*> -> {
+//                        output.append("(\n")
+//                        formatList(it, mapRecursionDepth + 1)
+//                        generateIndent(additionalIndent = mapRecursionDepth + 1)
+//                        output.append("),\n")
+//                    }
+//                    is Any -> {
+//                        output.append("{\n")
+//                        output.append(generateConfig(value, mapRecursionDepth + 2))
+//                        generateIndent(additionalIndent = 1)
+//                        output.append("},\n")
+//                    }
+//                }
+//            }
+//        }
 
         val finalOrder: MutableMap<Int, Any> = mutableMapOf()
         val groups: MutableMap<String, ConfigGroup> = mutableMapOf()
@@ -100,7 +125,7 @@ class BastionComposer {
         }
 
         val properties: MutableList<KProperty1<*, *>> = mutableListOf()
-        finalOrder.entries.sortedBy { it.key }.forEach {(position, entry) ->
+        finalOrder.entries.sortedBy { it.key }.forEach { (position, entry) ->
             run {
                 when (entry) {
                     is ConfigGroup -> {
@@ -151,13 +176,18 @@ class BastionComposer {
                     generateIndent()
                     output.append("]\n")
                 }
-                is Map<*,*> -> {
-                    val map: Map<String, Int> = mapOf()
-                    //map.entries.forEach()
+
+                is Map<*, *> -> {
+                    TODO("Throw, exception maps are not supported yet")
+//                    output.append("${property.name} = (\n")
+//                    formatList(value)
+//                    generateIndent()
+//                    output.append(")\n")
                 }
-//                is Sequence<*> -> {
-//
-//                }
+
+                is Sequence<*> -> {
+                    TODO("not yet implemented, check in how far the behavior of sequences is different from lists")
+                }
                 // ...
                 is Any -> {
                     // if it's a nested object, recursively generate the values for it.
@@ -166,6 +196,7 @@ class BastionComposer {
                     generateIndent()
                     output.append("}\n")
                 }
+
                 else -> {
                     println("Error: No composition rule for configuration value ${property.name} found! Skipping..")
                 }
