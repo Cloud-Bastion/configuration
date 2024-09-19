@@ -33,9 +33,6 @@ line: COMMENT
 
 //
 
-// Comments
-COMMENT: [#].* -> skip;
-
 // Properties
 property: ID '=' value (',' ID '=' value)* (',')?;
 
@@ -73,4 +70,8 @@ INT: [0-9]+;
 FLOAT: [0-9]+ '.' [0-9]*;
 BOOLEAN: 'true' | 'false';
 NEWLINE: [\r\n]+ -> skip;
-WS: [ \t]+ -> skip;
+
+// Comments & White spaces
+COMMENT: '/*' .*? '*/' -> skip;
+SINGLE_LINE_COMMENT: '//' ~[\r\n]* -> skip;
+WS: [ \t\r\n\u000C]+ -> skip;
