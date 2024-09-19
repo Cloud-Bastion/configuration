@@ -54,7 +54,7 @@ value: STRING       # StringValue
 list: ID '=' '[' (value (',' value)*)? (',')? ']';
 
 // Maps
-map: ID '=' '{' (keyValuePair (',' keyValuePair)*)? (',')? '}';
+map: ID '=' '(' (keyValuePair (',' keyValuePair)*)? (',')? ')';
 
 // Multi-line string block
 stringblock: ID '=' ('["\r\n]')* '|' WS? '"' (STRING'["\r\n]')* '"' (WS? '\n' WS? '|' WS? '"' (STRING'["\r\n]')) ;
