@@ -16,12 +16,6 @@ class ObjectVisitor: BastionYMLBaseVisitor<Any?>() {
 
     private var objectClass: KClass<*>? = null
 
-    fun BastionYMLParser.ValueContext.isPrimitive(): Boolean {
-        return !(this is BastionYMLParser.ListValueContext
-                || this is BastionYMLParser.MapValueContext
-                || this is BastionYMLParser.ObjectValueContext)
-    }
-
     fun <Receiver> KMutableProperty.Setter<Receiver>.callSafe(receiver: Any?, value: BastionYMLParser.ValueContext) {
         when (value) {
             is BastionYMLParser.StringValueContext -> {
@@ -38,6 +32,10 @@ class ObjectVisitor: BastionYMLBaseVisitor<Any?>() {
 
             is BastionYMLParser.FloatValueContext -> {
                 this.call(receiver, value.text.toFloat())
+            }
+
+            is BastionYMLParser.ListValueContext -> {
+                this.call(receiver, ListVisitor().visitList(value.list()))
             }
 
             else -> {
@@ -60,33 +58,13 @@ class ObjectVisitor: BastionYMLBaseVisitor<Any?>() {
             val value: BastionYMLParser.ValueContext = ctx.value(index)
                 ?: TODO("Throw exception that value is not set properly in config file")
 
-            if (value.isPrimitive()) {
-                val instance = injector.getInstance(this.objectClass!!.java)
-                val changeProperty = objectClass!!.memberProperties.find { it.name == key }
-                if (changeProperty is KMutableProperty<*>) {
-                    changeProperty.setter.callSafe(instance, value)
-                    println("Set value of $key to ${value.text}")
-                    // changeProperty.setter.call(instance, value.text)
-                } else {
-                    TODO("Exception: property does not exist or is declared as immutable (val). Try changing it to var.")
-                }
+            val instance = injector.getInstance(this.objectClass!!.java)
+            val changeProperty = objectClass!!.memberProperties.find { it.name == key }
+            if (changeProperty is KMutableProperty<*>) {
+                changeProperty.setter.callSafe(instance, value)
+            } else {
+                TODO("Exception: property does not exist or is declared as immutable (val). Try changing it to var.")
             }
-
-//            if (value is BastionYMLParser.ListValueContext) {
-//                println("Property contains a list value!")
-//
-//
-//                val instance = injector.getInstance(this.objectClass!!.java)
-//                val changeProperty = objectClass!!.memberProperties.find { it.name == key }
-//                if (changeProperty is KMutableProperty<*>) {
-//                    changeProperty.setter.call(instance, ListVisitor().visitList(value.list()))
-//                    println("Set value of $key to ${value.text}")
-//                    // changeProperty.setter.call(instance, value.text)
-//                } else {
-//                    TODO("Exception: property does not exist or is declared as immutable (val). Try changing it to var.")
-//                }
-//            }
-
 
         }
         return super.visitProperty(ctx)
