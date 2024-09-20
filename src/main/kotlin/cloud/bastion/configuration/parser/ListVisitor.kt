@@ -1,7 +1,7 @@
 package cloud.bastion.configuration.parser
 
-import cloud.bastion.configuration.parsers.generated.BastionYMLBaseVisitor
-import cloud.bastion.configuration.parsers.generated.BastionYMLParser
+import cloud.bastion.configuration.parser.generated.BastionYMLBaseVisitor
+import cloud.bastion.configuration.parser.generated.BastionYMLParser
 
 class ListVisitor: BastionYMLBaseVisitor<List<Any>>() {
 
