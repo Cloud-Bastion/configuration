@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
     id("com.strumenta.antlr-kotlin") version "1.0.0"
+    id("maven-publish")
     kotlin("jvm") version "1.9.21"
 }
 
@@ -18,6 +19,20 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("org.mockito:mockito-core:5.13.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+}
+
+publishing {
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Cloud-Bastion/configuration")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
 
 kotlin {
