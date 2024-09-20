@@ -15,6 +15,7 @@ class ObjectVisitor: BastionYMLBaseVisitor<Any?>() {
     private lateinit var injector: Injector
 
     private var objectClass: KClass<*>? = null
+    private var recursiveInstance: Any? = null
 
     fun <Receiver> KMutableProperty.Setter<Receiver>.callSafe(receiver: Any?, value: BastionYMLParser.ValueContext) {
         when (value) {
@@ -38,8 +39,13 @@ class ObjectVisitor: BastionYMLBaseVisitor<Any?>() {
                 this.call(receiver, ListVisitor().visitList(value.list()))
             }
 
+            is BastionYMLParser.ObjectValueContext -> {
+                val result: Any? = injector.getInstance(ObjectVisitor::class.java).visitObjectRecursively(value.object_(), (this.property.returnType.classifier as KClass<*>))
+                this.call(receiver, result!!)
+            }
+
             else -> {
-                TODO("Throw exception, unhandled data type")
+                TODO("Throw exception, unhandled datatype or object with an invalid definition")
             }
         }
     }
@@ -49,38 +55,45 @@ class ObjectVisitor: BastionYMLBaseVisitor<Any?>() {
         return super.visit(tree)
     }
 
+    private fun visitObjectRecursively(ctx: BastionYMLParser.ObjectContext, objectClass: KClass<*>): Any? {
+        this.objectClass = objectClass
+        this.recursiveInstance = injector.getInstance(this.objectClass!!.java)
+        ctx.property().forEach {
+            this.visitProperty(it)
+        }
+        return recursiveInstance
+    }
+
     override fun visitProperty(ctx: BastionYMLParser.PropertyContext): Any? {
+        fun getInstance(): Any {
+            if (this.recursiveInstance != null) {
+                return this.recursiveInstance!!
+            } else {
+                return injector.getInstance(this.objectClass!!.java)
+            }
+        }
+
         checkNotNull(this.objectClass)
 
         ctx.ID().forEachIndexed { index, keyContext ->
-            println("")
             val key: String = keyContext.text
             val value: BastionYMLParser.ValueContext = ctx.value(index)
                 ?: TODO("Throw exception that value is not set properly in config file")
 
-            val instance = injector.getInstance(this.objectClass!!.java)
+            val instance = getInstance()
             val changeProperty = objectClass!!.memberProperties.find { it.name == key }
             if (changeProperty is KMutableProperty<*>) {
                 changeProperty.setter.callSafe(instance, value)
             } else {
-                TODO("Exception: property does not exist or is declared as immutable (val). Try changing it to var.")
+                // TODO("Exception: property does not exist or is declared as immutable (val). Try changing it to var.")
             }
 
         }
         return super.visitProperty(ctx)
     }
 
-    override fun visitList(ctx: BastionYMLParser.ListContext): Any? {
-        return super.visitList(ctx)
-    }
-
-    override fun visitObject(ctx: BastionYMLParser.ObjectContext): Any? {
-
-
-        return super.visitObject(ctx)
-    }
-
     override fun defaultResult(): Any? {
         return null
     }
+
 }
