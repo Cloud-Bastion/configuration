@@ -4,8 +4,12 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 plugins {
     id("com.strumenta.antlr-kotlin") version "1.0.0"
     id("maven-publish")
+    id("java-library")
     kotlin("jvm") version "1.9.21"
 }
+
+group = "cloud.bastion"
+version = "0.0.3"
 
 repositories {
     mavenCentral()
@@ -21,7 +25,30 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 }
 
+java {
+    withSourcesJar()
+}
+
 publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            /*artifactId = "configuration"
+            pom {
+                name = "configuration"
+                description = "description"
+                url = "https://github.com/Cloud-Bastion/configuration"
+                licenses {
+                    licenses {}
+                }
+                developers {
+                    developer {}
+                }
+
+            }
+*/
+            from(components["java"])
+        }
+    }
 
     repositories {
         maven {
@@ -30,16 +57,6 @@ publishing {
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-}
-
-kotlin {
-    sourceSets {
-        main {
-            dependencies {
-                implementation("com.strumenta:antlr-kotlin-runtime:1.0.0")
             }
         }
     }
@@ -55,7 +72,7 @@ val generateKotlinGrammarSource = tasks.register<AntlrKotlinTask>("generateKotli
         include("**/*.g4")
     }
 
-    val pkgName = "cloud.bastion.configuration.parsers.generated"
+    val pkgName = "cloud.bastion.configuration.parser.generated"
     packageName = pkgName
     arguments = listOf("-visitor")
 
@@ -68,6 +85,16 @@ tasks.withType<KotlinCompile<*>> {
     dependsOn(generateKotlinGrammarSource)
 }
 
+tasks.withType<Jar> {
+    dependsOn(generateKotlinGrammarSource)
+}
+
+tasks.register<Jar>("sourcesJar2") {
+    from(sourceSets.main.get().allSource)
+    archiveClassifier.set("sources")
+    dependsOn(generateKotlinGrammarSource)
+}
+
 tasks.test {
     useJUnitPlatform()
 }
@@ -77,6 +104,9 @@ kotlin {
         main {
             kotlin {
                 srcDir(layout.buildDirectory.dir("generatedAntlr"))
+            }
+            dependencies {
+                implementation("com.strumenta:antlr-kotlin-runtime:1.0.0")
             }
         }
     }
