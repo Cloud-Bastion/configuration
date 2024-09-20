@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "cloud.bastion"
-version = "0.0.3"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
@@ -32,20 +32,25 @@ java {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            /*artifactId = "configuration"
+            artifactId = "configuration"
             pom {
                 name = "configuration"
-                description = "description"
+                description = "A versatile configuration library based on a custom file format."
                 url = "https://github.com/Cloud-Bastion/configuration"
                 licenses {
                     licenses {}
                 }
                 developers {
-                    developer {}
+                    developer {
+                        name = "Aventix"
+                    }
+                    developer {
+                        name = "pxav"
+                    }
                 }
 
             }
-*/
+
             from(components["java"])
         }
     }
