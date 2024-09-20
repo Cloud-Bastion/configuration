@@ -61,7 +61,7 @@ stringblock: ID '=' ('["\r\n]')* '|' WS? '"' (STRING'["\r\n]')* '"' (WS? '\n' WS
 keyValuePair: ID '=' value;
 
 // Objects
-object: ID '=' '{' (property (',' property)*)? (',')? '}';
+object: '{' (property (',' property)*)? (',')? '}';
 
 // Tokens
 ID: [a-zA-Z_][a-zA-Z_0-9]*;
