@@ -48,7 +48,7 @@ value: STRING       # StringValue
 // Multi-line strings block
 
 // Lists : supports multi line lists by default
-list: ID '=' '[' (value (',' value)*)? (',')? ']';
+list: '[' (value (',' value)*)? (',')? ']';
 
 // Maps
 map: ID '=' '(' (keyValuePair (',' keyValuePair)*)? (',')? ')';
